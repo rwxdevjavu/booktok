@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
 
-function App() {
-  const [count, setCount] = useState(0)
+import quotes from "./data/quotes";
+import useAutoPlay from "./hooks/useAutoPlay";
+import QuoteCard from "./components/QuoteCard";
+import Actions from "./components/Actions";
+import Controls from "./components/Controls";
+import ShareModal from "./components/sharePopup";
+
+export default function App() {
+  const [index, setIndex] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [liked, setLiked] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
+  const next = useCallback(() => {
+    setIndex((prev) => (prev + 1) % quotes.length);
+    setLiked(false);
+  }, []);
+
+  const prev = useCallback(() => {
+    setIndex((prev) => (prev - 1 + quotes.length) % quotes.length);
+    setLiked(false);
+  }, []);
+
+  useAutoPlay(autoPlay, next, 4000);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 sm:p-6">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl min-h-[50vh] sm:min-h-[16rem] flex flex-col items-center justify-center relative px-2">
+        <AnimatePresence mode="wait">
+          <QuoteCard quote={quotes[index]} />
+        </AnimatePresence>
+        <Actions
+          liked={liked}
+          onLike={() => setLiked((prev) => !prev)}
+          onShare={() => setIsShareOpen(true)}
+        />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
 
-export default App
+      <Controls
+        onPrev={prev}
+        onNext={next}
+        autoPlay={autoPlay}
+        toggleAutoPlay={() => setAutoPlay((a) => !a)}
+      />
+      
+      <ShareModal isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
+    </div>
+  );
+}
