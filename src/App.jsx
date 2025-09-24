@@ -6,7 +6,7 @@ import useAutoPlay from "./hooks/useAutoPlay";
 import QuoteCard from "./components/QuoteCard";
 import Actions from "./components/Actions";
 import Controls from "./components/Controls";
-import ShareModal from "./components/sharePopup";
+import SharePopup from "./components/sharePopup";
 
 export default function App() {
   const [index, setIndex] = useState(0);
@@ -46,7 +46,7 @@ export default function App() {
         toggleAutoPlay={() => setAutoPlay((a) => !a)}
       />
       
-      <ShareModal isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
+      <SharePopup isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
     </div>
   );
 }
